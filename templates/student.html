@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Panel Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>🎓 Student Portal Login</h2>
+
+    <input type="text" id="student_name" placeholder="Enter Your Full Name"><br>
+    <input type="text" id="major" placeholder="Enter Your Major"><br>
+    <input type="password" id="secret_password" placeholder="Enter Your grade"><br>
+    <button onclick="loginStudent()">Login</button>
+
+    <p id="result"></p>
+</div>
+
+<script>
+function loginStudent() {
+    const name = document.getElementById('student_name').value;
+    const major = document.getElementById('major').value;
+    const secret = document.getElementById('secret_password').value;
+
+    // Concatenate major + secret to generate login "password"
+    const loginPassword = major + secret;
+
+    fetch('/student_login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ name: name, password: loginPassword })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success"){
+            // Redirect to student dashboard with their certificate data
+            window.location.href = `/student_dashboard?name=${encodeURIComponent(name)}`;
+        } else {
+            document.getElementById("result").innerText = "❌ Invalid login. Check your name and password.";
+        }
+    })
+    .catch(err => alert("Error: " + err));
+}
+</script>
+</body>
+</html>

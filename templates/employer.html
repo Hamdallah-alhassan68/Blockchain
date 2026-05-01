@@ -1,0 +1,127 @@
+
+<html>
+<head>
+    <title>Employer Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        #result.valid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        #result.invalid {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>🏢 Employer Panel</h2>
+</header>
+
+<div class="container">
+    <p>Enter the <strong>Certificate ID (Hash)</strong> provided by the student to verify it:</p>
+    <input id="cert_id" placeholder="Enter Certificate ID (Hash)">
+    <button onclick="verify()">Verify Certificate</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+function verify() {
+    const cert_id = document.getElementById('cert_id').value.trim();
+    
+    if (!cert_id) {
+        alert("Please enter a Certificate ID.");
+        return;
+    }
+
+    fetch('/verify_certificate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ certificate_id: cert_id })
+    })
+    .then(response => {
+        // If the server crashes (500 error), this handles it gracefully
+        if (!response.ok) {
+            throw new Error('Server returned error ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === "valid") {
+            alert("✅ Certificate Valid!\nData: " + data.data);
+            // Optional: Update a div on your page instead of an alert
+            // document.getElementById('result').innerHTML = `Verified: ${data.data}`;
+        } else {
+            alert("❌ Invalid: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("System Error: Could not verify certificate. Check the server console.");
+    });
+}
+
+</script>
+
+</body>
+</html>
